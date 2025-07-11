@@ -4,7 +4,6 @@ import psycopg2
 import sys
 import time
 
-
 if __name__ == '__main__':
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('--db_host', required=True)
@@ -19,14 +18,11 @@ if __name__ == '__main__':
     while (time.time() - start_time) < args.timeout:
         try:
             conn = psycopg2.connect(user=args.db_user, host=args.db_host, port=args.db_port, password=args.db_password, dbname='postgres')
-            error = ''
-            break
+            conn.close()
+            sys.exit(0)
         except psycopg2.OperationalError as e:
             error = e
-        else:
-            conn.close()
         time.sleep(1)
 
-    if error:
-        print("Database connection failure: %s" % error, file=sys.stderr)
-        sys.exit(1)
+    print("Database connection failure: %s" % error, file=sys.stderr)
+    sys.exit(1)
